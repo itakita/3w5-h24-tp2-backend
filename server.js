@@ -11,7 +11,7 @@ app.get("/newClass", (req, res) => {
   console.log(index);
   const yourNewClass = classes[index];
   res.send(yourNewClass);
-});
+}); 
 
 app.use(express.static("public"));
 
