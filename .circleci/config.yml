@@ -14,19 +14,40 @@ jobs:
       - run: cd ./3w5-h24-tp2-backend && npm install
       - run: cd ./3w5-h24-tp2-backend && npm run test
 
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/node:18.16.1
+  integrationFrontend:
+    machine: true
     steps:
-      # Replace this with steps to deploy to users
+      - run: git clone https://github.com/itakita/3w5-h24-tp2-frontend.git
+      - run: git clone https://github.com/itakita/3w5-h24-tp2-backend.git
+      - run: cd ./3w5-h24-tp2-frontend && npm install
+      - run: cd ./3w5-h24-tp2-frontend && npm run build
+      - run: cd ./3w5-h24-tp2-backend && mkdir public
+      - run: cp -rT ./3w5-h24-tp2-frontend/build/* ./3w5-h24-tp2-backend/public/
+      - persist_to_workspace:
+          root: .
+          paths:
+            - 3w5-h24-tp2-backend 
+
+
+
+  deploiement:
+    machine: true
+    steps:
+      - attach_workspace:
+            at: . 
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          name: deploiement
+          command: cd ./3w5-h24-tp2-backend && ls -Rl
 workflows:
-  build-and-test:
+  workflow-tp2:
     jobs:
       - checkoutEtTests
+      - integrationFrontend:
+             requires:
+               - checkoutEtTests
+      - deploiement:
+            requires:
+              - integrationFrontend
     # - deploy:
     #     requires:
     #       - test-node
